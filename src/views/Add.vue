@@ -23,13 +23,16 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('dynamicValidateForm')">Submit</el-button>
-        <el-button @click="resetForm('dynamicValidateForm')">Reset</el-button>
+        <el-button @click="resetForm()">Reset</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import API from '../config';
+
   export default {
     data() {
       return {
@@ -41,17 +44,26 @@
     },
     methods: {
       submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
+        axios({
+          method: "POST",
+          "url": API.url + "users/",
+          "data": {
+            ...this.dynamicValidateForm
+          }})
+        .then(result => {
+            // this.tableData.splice(index, 1);
+            console.log(result);
+            this.resetForm();
+            //console.log(this.tableData);
+        }, error => {
+            console.error(error);
         });
       },
       resetForm(formName) {
-        this.$refs[formName].resetFields();
+        this.dynamicValidateForm ={
+          name: '',
+          email: ''
+        }
       },
     }
   }

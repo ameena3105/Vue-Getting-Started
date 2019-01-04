@@ -1,6 +1,5 @@
 <template>
   <div class="edit">
-    <h1>Add User</h1>
     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="120px" class="demo-dynamic">
       <el-form-item
         label="Name"
@@ -36,7 +35,7 @@
       };
     },
     methods: {
-      
+
     }
   }
 </script>

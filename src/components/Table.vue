@@ -26,8 +26,8 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="dialogVisible = true"
-          
+          @click="showPopup(scope.$index, scope.row)"
+
           icon="el-icon-edit"></el-button>
         <el-button
           size="mini"
@@ -43,17 +43,36 @@
     :visible.sync="dialogVisible"
     width="30%"
     :before-close="handleClose">
-    <Edit />
+    <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="120px" class="demo-dynamic">
+      <el-form-item
+        label="Name"
+        prop="name"
+        :rules="{
+          required: true, message: 'Name can not be null', trigger: 'blur'
+        }"
+      >
+        <el-input v-model="dynamicValidateForm.name"></el-input>
+      </el-form-item>
+      <el-form-item
+        prop="email"
+        label="Email"
+        :rules="[
+          { required: true, message: 'Please input email address', trigger: 'blur' },
+          { type: 'email', message: 'Please input correct email address', trigger: ['blur', 'change'] }
+        ]"
+      >
+        <el-input v-model="dynamicValidateForm.email"></el-input>
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">Cancel</el-button>
-      <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+      <el-button type="primary" @click="updateMethod()">Confirm</el-button>
     </span>
   </el-dialog>
   </div>
 </template>
 
 <script>
-  import Edit from '@/components/Edit.vue'; // @ is an alias to /src
   import axios from "axios";
   import API from '../config';
 
@@ -80,12 +99,17 @@
         tableData: [],
         search: '',
         dialogVisible: false,
+        dynamicValidateForm: {
+          name: '',
+          email: '',
+          id:'',
+        },
       }
     },
     mounted() {
         axios({ method: "GET", "url": API.url + "users/" })
         .then(result => {
-            //this.tableData.push({id,name: first_name,email:last_name});
+            this.tableData= result.data;
             console.log(result);
             //console.log(this.tableData);
         }, error => {
@@ -106,7 +130,19 @@
           cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
-          this.tableData.splice(index, 1);
+          axios({
+            method: "POST",
+            "url": API.url + "users/delete",
+            "data": {
+              id: this.tableData[index].id
+            }})
+          .then(result => {
+              this.tableData.splice(index, 1);
+              console.log(result);
+              //console.log(this.tableData);
+          }, error => {
+              console.error(error);
+          });
           this.$message({
             type: 'success',
             message: 'Delete completed'
@@ -115,14 +151,42 @@
           this.$message({
             type: 'info',
             message: 'Delete canceled'
-          });          
+          });
+        });
+      },
+      showPopup(index, row) {
+        this.dialogVisible = true;
+        this.dynamicValidateForm.id = row.id;
+        console.log(index,row);
+      },
+      updateMethod() {
+        console.log(this.dynamicValidateForm);
+        axios({
+          method: "POST",
+          "url": API.url + "users/update",
+          "data": {
+            ...this.dynamicValidateForm
+          }})
+        .then(result => {
+            // this.tableData.splice(index, 1);
+            console.log(result);
+            //console.log(this.tableData);
+        }, error => {
+            console.error(error);
+        });
+        axios({ method: "GET", "url": API.url + "users/" })
+        .then(result => {
+          console.log("asdff", result);
+            this.tableData= result.data;
+            console.log(result);
+            this.dialogVisible = false
+            //console.log(this.tableData);
+        }, error => {
+            console.error(error);
         });
       }
     },
-    components: {
-        Edit,
-    },
-      
+
   }
 </script>
 
