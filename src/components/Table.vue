@@ -1,7 +1,7 @@
 <template>
   <div class="table">
     <el-table
-    :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+    :data="tableData"
     style="width: 100%">
     <el-table-column
       label="ID"
@@ -54,10 +54,13 @@
 
 <script>
   import Edit from '@/components/Edit.vue'; // @ is an alias to /src
+  import axios from "axios";
+  import API from '../config';
+
   export default {
     data() {
       return {
-        tableData: [{
+        /*tableData: [{
           id: '03',
           name: 'Tom',
           email: 'tom@new.com'
@@ -73,10 +76,21 @@
           id: '01',
           name: 'Jessy',
           email: 'jessy@new.com'
-        }],
+        }],*/
+        tableData: [],
         search: '',
         dialogVisible: false,
       }
+    },
+    mounted() {
+        axios({ method: "GET", "url": API.url + "users/" })
+        .then(result => {
+            //this.tableData.push({id,name: first_name,email:last_name});
+            console.log(result);
+            //console.log(this.tableData);
+        }, error => {
+            console.error(error);
+        });
     },
     methods: {
       handleClose(done) {
