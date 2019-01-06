@@ -170,20 +170,21 @@
         .then(result => {
             // this.tableData.splice(index, 1);
             console.log(result);
+            axios({ method: "GET", "url": API.url + "users/" })
+            .then(result => {
+              console.log("asdff", result);
+                this.tableData= result.data;
+                console.log(result);
+                this.dialogVisible = false
+                //console.log(this.tableData);
+            }, error => {
+                console.error(error);
+            });
             //console.log(this.tableData);
         }, error => {
             console.error(error);
         });
-        axios({ method: "GET", "url": API.url + "users/" })
-        .then(result => {
-          console.log("asdff", result);
-            this.tableData= result.data;
-            console.log(result);
-            this.dialogVisible = false
-            //console.log(this.tableData);
-        }, error => {
-            console.error(error);
-        });
+
       }
     },
 
